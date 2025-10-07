@@ -43,8 +43,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         holder.category.setText(task.getCategory());
         holder.deadline.setText(task.getDeadline());
 
+        // Done/Undo button
+        holder.doneBtn.setImageResource(task.getStatus().equals("Completed") ?
+                android.R.drawable.ic_menu_revert : android.R.drawable.ic_menu_save);
+
+        holder.doneBtn.setOnClickListener(v -> {
+            task.setStatus(task.getStatus().equals("Completed") ? "Pending" : "Completed");
+            listener.onMarkDone(task);
+        });
+
         holder.deleteBtn.setOnClickListener(v -> listener.onDelete(task));
-        holder.doneBtn.setOnClickListener(v -> listener.onMarkDone(task));
     }
 
     @Override

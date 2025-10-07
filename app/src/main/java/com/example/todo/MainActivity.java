@@ -37,18 +37,18 @@ public class MainActivity extends AppCompatActivity {
         adapter = new TaskAdapter(this, taskList, new TaskAdapter.OnTaskActionListener() {
             @Override
             public void onDelete(Task task) {
-                dbHelper.deleteTask(task.getId());
-                loadTasks();
-                Toast.makeText(MainActivity.this, "Task deleted", Toast.LENGTH_SHORT).show();
+                if(dbHelper.deleteTask(task.getId())){
+                    Toast.makeText(MainActivity.this, "Task deleted", Toast.LENGTH_SHORT).show();
+                    loadTasks();
+                }
             }
 
             @Override
             public void onMarkDone(Task task) {
-                task.setStatus("Completed");
-                dbHelper.updateTask(task.getId(), task.getTitle(), task.getDescription(),
-                        task.getPriority(), task.getStatus(), task.getCategory(), task.getDeadline());
-                loadTasks();
-                Toast.makeText(MainActivity.this, "Task marked done", Toast.LENGTH_SHORT).show();
+                if(dbHelper.updateTask(task)){
+                    Toast.makeText(MainActivity.this, task.getStatus().equals("Completed") ? "Marked done" : "Marked pending", Toast.LENGTH_SHORT).show();
+                    loadTasks();
+                }
             }
         });
 
@@ -66,20 +66,19 @@ public class MainActivity extends AppCompatActivity {
         if(cursor != null && cursor.moveToFirst()){
             emptyTv.setVisibility(View.GONE);
             do{
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
-                String title = cursor.getString(cursor.getColumnIndexOrThrow("title"));
-                String desc = cursor.getString(cursor.getColumnIndexOrThrow("description"));
-                String priority = cursor.getString(cursor.getColumnIndexOrThrow("priority"));
-                String status = cursor.getString(cursor.getColumnIndexOrThrow("status"));
-                String category = cursor.getString(cursor.getColumnIndexOrThrow("category"));
-                String deadline = cursor.getString(cursor.getColumnIndexOrThrow("deadline"));
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(DBHelper.TASK_ID));
+                String title = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_TITLE));
+                String desc = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_DESC));
+                String priority = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_PRIORITY));
+                String status = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_STATUS));
+                String category = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_CATEGORY));
+                String deadline = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_DEADLINE));
 
                 taskList.add(new Task(id, title, desc, priority, status, category, deadline));
             } while(cursor.moveToNext());
         } else {
             emptyTv.setVisibility(View.VISIBLE);
         }
-
         if(cursor != null) cursor.close();
         adapter.notifyDataSetChanged();
     }
