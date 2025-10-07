@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="priority_array">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+    </string-array>
+
+    <string-array name="status_array">
+        <item>Pending</item>
+        <item>Completed</item>
+    </string-array>
+
+    <string-array name="category_array">
+        <item>Work</item>
+        <item>Personal</item>
+        <item>Shopping</item>
+        <item>Others</item>
+    </string-array>
+</resources>
