@@ -1,7 +1,7 @@
 package com.example.todo;
 
-import android.content.Context;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -9,16 +9,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "todo.db";
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 2; // incremented for new columns
 
-    // Users table
     public static final String TABLE_USERS = "users";
     public static final String COL_ID = "id";
     public static final String COL_NAME = "name";
     public static final String COL_EMAIL = "email";
     public static final String COL_PASSWORD = "password";
 
-    // Tasks table
     public static final String TABLE_TASKS = "tasks";
     public static final String TASK_ID = "id";
     public static final String TASK_TITLE = "title";
@@ -27,6 +25,8 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String TASK_STATUS = "status";
     public static final String TASK_CATEGORY = "category";
     public static final String TASK_DEADLINE = "deadline";
+    public static final String TASK_START_TIME = "start_time";
+    public static final String TASK_REMINDERS = "reminders";
 
     public DBHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -34,7 +34,6 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Users table
         String createUsers = "CREATE TABLE " + TABLE_USERS + " (" +
                 COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 COL_NAME + " TEXT," +
@@ -42,7 +41,6 @@ public class DBHelper extends SQLiteOpenHelper {
                 COL_PASSWORD + " TEXT)";
         db.execSQL(createUsers);
 
-        // Tasks table
         String createTasks = "CREATE TABLE " + TABLE_TASKS + " (" +
                 TASK_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 TASK_TITLE + " TEXT," +
@@ -50,7 +48,9 @@ public class DBHelper extends SQLiteOpenHelper {
                 TASK_PRIORITY + " TEXT," +
                 TASK_STATUS + " TEXT," +
                 TASK_CATEGORY + " TEXT," +
-                TASK_DEADLINE + " TEXT)";
+                TASK_DEADLINE + " TEXT," +
+                TASK_START_TIME + " TEXT," +
+                TASK_REMINDERS + " TEXT)";
         db.execSQL(createTasks);
     }
 
@@ -61,7 +61,7 @@ public class DBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    // ----- User Methods -----
+    // User methods
     public boolean registerUser(String name, String email, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -82,7 +82,7 @@ public class DBHelper extends SQLiteOpenHelper {
         return exists;
     }
 
-    // ----- Task Methods -----
+    // Task methods
     public boolean addTask(Task task) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -92,6 +92,8 @@ public class DBHelper extends SQLiteOpenHelper {
         cv.put(TASK_STATUS, task.getStatus());
         cv.put(TASK_CATEGORY, task.getCategory());
         cv.put(TASK_DEADLINE, task.getDeadline());
+        cv.put(TASK_START_TIME, task.getStartTime());
+        cv.put(TASK_REMINDERS, task.getReminders());
         long result = db.insert(TABLE_TASKS, null, cv);
         return result != -1;
     }
@@ -99,6 +101,28 @@ public class DBHelper extends SQLiteOpenHelper {
     public Cursor getAllTasks() {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_TASKS + " ORDER BY " + TASK_ID + " DESC", null);
+    }
+
+    public Task getTaskById(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_TASKS, null, TASK_ID + "=?",
+                new String[]{String.valueOf(id)}, null, null, null);
+        if(cursor != null && cursor.moveToFirst()){
+            Task task = new Task(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(TASK_ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_TITLE)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_DESC)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_PRIORITY)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_STATUS)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_CATEGORY)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_DEADLINE)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_START_TIME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_REMINDERS))
+            );
+            cursor.close();
+            return task;
+        }
+        return null;
     }
 
     public boolean updateTask(Task task) {
@@ -110,33 +134,15 @@ public class DBHelper extends SQLiteOpenHelper {
         cv.put(TASK_STATUS, task.getStatus());
         cv.put(TASK_CATEGORY, task.getCategory());
         cv.put(TASK_DEADLINE, task.getDeadline());
+        cv.put(TASK_START_TIME, task.getStartTime());
+        cv.put(TASK_REMINDERS, task.getReminders());
         int result = db.update(TABLE_TASKS, cv, TASK_ID + "=?", new String[]{String.valueOf(task.getId())});
         return result > 0;
     }
 
-    public boolean deleteTask(int id) {
+    public boolean deleteTask(int id){
         SQLiteDatabase db = this.getWritableDatabase();
         int result = db.delete(TABLE_TASKS, TASK_ID + "=?", new String[]{String.valueOf(id)});
         return result > 0;
-    }
-
-    public Task getTaskById(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_TASKS, null, TASK_ID + "=?",
-                new String[]{String.valueOf(id)}, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            Task task = new Task(
-                    cursor.getInt(cursor.getColumnIndexOrThrow(TASK_ID)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_TITLE)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_DESC)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_PRIORITY)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_STATUS)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_CATEGORY)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_DEADLINE))
-            );
-            cursor.close();
-            return task;
-        }
-        return null;
     }
 }

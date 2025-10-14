@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         adapter = new TaskAdapter(this, taskList, new TaskAdapter.OnTaskActionListener() {
             @Override
             public void onDelete(Task task) {
-                if(dbHelper.deleteTask(task.getId())){
+                if (dbHelper.deleteTask(task.getId())) {
                     Toast.makeText(MainActivity.this, "Task deleted", Toast.LENGTH_SHORT).show();
                     loadTasks();
                 }
@@ -45,8 +45,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onMarkDone(Task task) {
-                if(dbHelper.updateTask(task)){
-                    Toast.makeText(MainActivity.this, task.getStatus().equals("Completed") ? "Marked done" : "Marked pending", Toast.LENGTH_SHORT).show();
+                if (dbHelper.updateTask(task)) {
+                    Toast.makeText(MainActivity.this,
+                            task.getStatus().equals("Completed") ? "Marked done" : "Marked pending",
+                            Toast.LENGTH_SHORT).show();
                     loadTasks();
                 }
             }
@@ -60,12 +62,13 @@ public class MainActivity extends AppCompatActivity {
         loadTasks();
     }
 
-    private void loadTasks(){
+    private void loadTasks() {
         taskList.clear();
         Cursor cursor = dbHelper.getAllTasks();
-        if(cursor != null && cursor.moveToFirst()){
+
+        if (cursor != null && cursor.moveToFirst()) {
             emptyTv.setVisibility(View.GONE);
-            do{
+            do {
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow(DBHelper.TASK_ID));
                 String title = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_TITLE));
                 String desc = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_DESC));
@@ -73,13 +76,16 @@ public class MainActivity extends AppCompatActivity {
                 String status = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_STATUS));
                 String category = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_CATEGORY));
                 String deadline = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_DEADLINE));
+                String time = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_TIME)); // new field
+                String reminder = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_REMINDER)); // new field
 
-                taskList.add(new Task(id, title, desc, priority, status, category, deadline));
-            } while(cursor.moveToNext());
+                taskList.add(new Task(id, title, desc, priority, status, category, deadline, time, reminder));
+            } while (cursor.moveToNext());
         } else {
             emptyTv.setVisibility(View.VISIBLE);
         }
-        if(cursor != null) cursor.close();
+
+        if (cursor != null) cursor.close();
         adapter.notifyDataSetChanged();
     }
 

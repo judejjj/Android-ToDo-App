@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:text="Task Title"
             android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <!-- Task Description -->
         <TextView
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:text="Task description"
             android:textSize="14sp"
-            android:layout_marginTop="4dp"/>
+            android:layout_marginTop="4dp" />
 
         <!-- Task Info Row -->
         <LinearLayout
@@ -41,28 +41,43 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Priority"/>
+                android:text="Priority" />
 
             <TextView
                 android:id="@+id/taskStatus"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Status"/>
+                android:text="Status" />
 
             <TextView
                 android:id="@+id/taskCategory"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Category"/>
+                android:text="Category" />
+        </LinearLayout>
+
+        <!-- Deadline & Time -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
 
             <TextView
                 android:id="@+id/taskDeadline"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="Deadline"/>
+                android:text="Deadline" />
+
+            <TextView
+                android:id="@+id/taskTime"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="Time" />
         </LinearLayout>
 
         <!-- Buttons Row -->
@@ -79,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="Mark Done"
-                android:src="@android:drawable/ic_menu_agenda"/>
+                android:src="@android:drawable/ic_menu_agenda" />
 
             <ImageButton
                 android:id="@+id/deleteBtn"
@@ -87,7 +102,7 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="Delete Task"
-                android:src="@android:drawable/ic_menu_delete"/>
+                android:src="@android:drawable/ic_menu_delete" />
         </LinearLayout>
 
     </LinearLayout>
