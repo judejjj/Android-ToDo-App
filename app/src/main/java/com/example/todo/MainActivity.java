@@ -76,10 +76,10 @@ public class MainActivity extends AppCompatActivity {
                 String status = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_STATUS));
                 String category = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_CATEGORY));
                 String deadline = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_DEADLINE));
-                String time = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_TIME)); // new field
-                String reminder = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_REMINDER)); // new field
+                String startTime = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_START_TIME));
+                String reminders = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_REMINDERS));
 
-                taskList.add(new Task(id, title, desc, priority, status, category, deadline, time, reminder));
+                taskList.add(new Task(id, title, desc, priority, status, category, deadline, startTime, reminders));
             } while (cursor.moveToNext());
         } else {
             emptyTv.setVisibility(View.VISIBLE);

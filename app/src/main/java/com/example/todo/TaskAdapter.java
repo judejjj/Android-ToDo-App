@@ -36,7 +36,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     @Override
     public void onBindViewHolder(TaskViewHolder holder, int position) {
         Task task = taskList.get(position);
-        holder.title.setText(task.geTitle());
+        holder.title.setText(task.getTitle()); // ✅ fixed typo
         holder.desc.setText(task.getDescription());
         holder.priority.setText(task.getPriority());
         holder.status.setText(task.getStatus());
