@@ -7,7 +7,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +25,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Create notification channel once
+        ReminderScheduler.createNotificationChannel(this);
 
         dbHelper = new DBHelper(this);
         recyclerView = findViewById(R.id.recyclerView);
@@ -57,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        addBtn.setOnClickListener(v -> startActivity(new Intent(this, AddEditTaskActivity.class)));
+        addBtn.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, AddEditTaskActivity.class)));
 
         loadTasks();
     }
@@ -67,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = dbHelper.getAllTasks();
 
         if (cursor != null && cursor.moveToFirst()) {
-            emptyTv.setVisibility(View.GONE);
+            emptyTv.setVisibility(TextView.GONE);
             do {
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow(DBHelper.TASK_ID));
                 String title = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_TITLE));
@@ -76,13 +79,13 @@ public class MainActivity extends AppCompatActivity {
                 String status = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_STATUS));
                 String category = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_CATEGORY));
                 String deadline = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_DEADLINE));
-                String startTime = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_START_TIME));
                 String reminders = cursor.getString(cursor.getColumnIndexOrThrow(DBHelper.TASK_REMINDERS));
 
-                taskList.add(new Task(id, title, desc, priority, status, category, deadline, startTime, reminders));
+                // Constructor matches AddEditTaskActivity
+                taskList.add(new Task(id, title, desc, priority, status, category, deadline, reminders));
             } while (cursor.moveToNext());
         } else {
-            emptyTv.setVisibility(View.VISIBLE);
+            emptyTv.setVisibility(TextView.VISIBLE);
         }
 
         if (cursor != null) cursor.close();

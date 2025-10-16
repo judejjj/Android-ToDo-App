@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DBHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "todo.db";
-    public static final int DB_VERSION = 2; // incremented for new columns
+    public static final int DB_VERSION = 3; // incremented for type column
 
     public static final String TABLE_USERS = "users";
     public static final String COL_ID = "id";
@@ -24,6 +24,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final String TASK_PRIORITY = "priority";
     public static final String TASK_STATUS = "status";
     public static final String TASK_CATEGORY = "category";
+    public static final String TASK_TYPE = "type"; // new column: Task or Reminder
     public static final String TASK_DEADLINE = "deadline";
     public static final String TASK_START_TIME = "start_time";
     public static final String TASK_REMINDERS = "reminders";
@@ -48,6 +49,7 @@ public class DBHelper extends SQLiteOpenHelper {
                 TASK_PRIORITY + " TEXT," +
                 TASK_STATUS + " TEXT," +
                 TASK_CATEGORY + " TEXT," +
+                TASK_TYPE + " TEXT," +       // new column
                 TASK_DEADLINE + " TEXT," +
                 TASK_START_TIME + " TEXT," +
                 TASK_REMINDERS + " TEXT)";
@@ -56,6 +58,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Drop old table and recreate with new column
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_TASKS);
         onCreate(db);
@@ -91,6 +94,7 @@ public class DBHelper extends SQLiteOpenHelper {
         cv.put(TASK_PRIORITY, task.getPriority());
         cv.put(TASK_STATUS, task.getStatus());
         cv.put(TASK_CATEGORY, task.getCategory());
+        cv.put(TASK_TYPE, task.getType());  // save type
         cv.put(TASK_DEADLINE, task.getDeadline());
         cv.put(TASK_START_TIME, task.getStartTime());
         cv.put(TASK_REMINDERS, task.getReminders());
@@ -117,7 +121,8 @@ public class DBHelper extends SQLiteOpenHelper {
                     cursor.getString(cursor.getColumnIndexOrThrow(TASK_CATEGORY)),
                     cursor.getString(cursor.getColumnIndexOrThrow(TASK_DEADLINE)),
                     cursor.getString(cursor.getColumnIndexOrThrow(TASK_START_TIME)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_REMINDERS))
+                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_REMINDERS)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(TASK_TYPE)) // new field
             );
             cursor.close();
             return task;
@@ -133,6 +138,7 @@ public class DBHelper extends SQLiteOpenHelper {
         cv.put(TASK_PRIORITY, task.getPriority());
         cv.put(TASK_STATUS, task.getStatus());
         cv.put(TASK_CATEGORY, task.getCategory());
+        cv.put(TASK_TYPE, task.getType());
         cv.put(TASK_DEADLINE, task.getDeadline());
         cv.put(TASK_START_TIME, task.getStartTime());
         cv.put(TASK_REMINDERS, task.getReminders());

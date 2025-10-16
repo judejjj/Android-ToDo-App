@@ -7,12 +7,14 @@ public class Task {
     private String priority;
     private String status;
     private String category;
-    private String deadline;
-    private String startTime;
-    private String reminders;
+    private String deadline;      // only for reminders
+    private String startTime;     // only for reminders
+    private String reminders;     // CSV like "10,30"
+    private String type;          // "Task" or "Reminder"
 
+    // Full constructor
     public Task(int id, String title, String description, String priority, String status,
-                String category, String deadline, String startTime, String reminders) {
+                String category, String deadline, String startTime, String reminders, String type) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -22,12 +24,7 @@ public class Task {
         this.deadline = deadline;
         this.startTime = startTime;
         this.reminders = reminders;
-    }
-
-    // Constructor without startTime (for backward compatibility)
-    public Task(int id, String title, String description, String priority, String status,
-                String category, String deadline, String reminders) {
-        this(id, title, description, priority, status, category, deadline, "", reminders);
+        this.type = type;
     }
 
     // Getters
@@ -40,9 +37,9 @@ public class Task {
     public String getDeadline() { return deadline; }
     public String getStartTime() { return startTime; }
     public String getReminders() { return reminders; }
+    public String getType() { return type; }
 
     // Setters
-    public void setId(int id) { this.id = id; }
     public void setTitle(String title) { this.title = title; }
     public void setDescription(String description) { this.description = description; }
     public void setPriority(String priority) { this.priority = priority; }
@@ -51,4 +48,5 @@ public class Task {
     public void setDeadline(String deadline) { this.deadline = deadline; }
     public void setStartTime(String startTime) { this.startTime = startTime; }
     public void setReminders(String reminders) { this.reminders = reminders; }
+    public void setType(String type) { this.type = type; }
 }

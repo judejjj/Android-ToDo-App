@@ -38,15 +38,15 @@ public class ReminderScheduler {
         }
     }
 
-    private static void createNotificationChannel(Context context){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            CharSequence name = "Task Reminders";
-            String description = "Channel for task reminder notifications";
+    public static void createNotificationChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Reminders";
+            String description = "Task reminder notifications";
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
             NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
-            if(notificationManager != null) notificationManager.createNotificationChannel(channel);
+            notificationManager.createNotificationChannel(channel);
         }
     }
 

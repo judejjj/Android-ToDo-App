@@ -4,11 +4,14 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -22,6 +25,8 @@ public class AddEditTaskActivity extends AppCompatActivity {
     Button saveBtn;
     DBHelper dbHelper;
     Calendar selectedDateTime = Calendar.getInstance();
+    RadioGroup typeGroup;
+    RadioButton taskRb, reminderRb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +34,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_edit_task);
 
         dbHelper = new DBHelper(this);
+
         titleEt = findViewById(R.id.titleEt);
         descEt = findViewById(R.id.descEt);
         deadlineEt = findViewById(R.id.deadlineEt);
@@ -40,10 +46,33 @@ public class AddEditTaskActivity extends AppCompatActivity {
         remind30 = findViewById(R.id.remind30);
         remind60 = findViewById(R.id.remind60);
         saveBtn = findViewById(R.id.saveBtn);
+        typeGroup = findViewById(R.id.typeGroup);
+        taskRb = findViewById(R.id.taskRb);
+        reminderRb = findViewById(R.id.reminderRb);
 
+        // Spinner setup
         prioritySp.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"Low","Medium","High"}));
         statusSp.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"Pending","Completed"}));
         categorySp.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"Work","Personal","Other"}));
+
+        // Show/hide date/time/reminder based on type
+        typeGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.taskRb.getId()) {
+                // Task: hide deadline, time, reminders
+                deadlineEt.setVisibility(View.GONE);
+                timeEt.setVisibility(View.GONE);
+                remind10.setVisibility(View.GONE);
+                remind30.setVisibility(View.GONE);
+                remind60.setVisibility(View.GONE);
+            } else {
+                // Reminder: show all
+                deadlineEt.setVisibility(View.VISIBLE);
+                timeEt.setVisibility(View.VISIBLE);
+                remind10.setVisibility(View.VISIBLE);
+                remind30.setVisibility(View.VISIBLE);
+                remind60.setVisibility(View.VISIBLE);
+            }
+        });
 
         deadlineEt.setOnClickListener(v -> showDatePicker());
         timeEt.setOnClickListener(v -> showTimePicker());
@@ -82,33 +111,53 @@ public class AddEditTaskActivity extends AppCompatActivity {
         String priority = prioritySp.getSelectedItem().toString();
         String status = statusSp.getSelectedItem().toString();
         String category = categorySp.getSelectedItem().toString();
-        String deadline = deadlineEt.getText().toString().trim() + " " + timeEt.getText().toString().trim();
+        String type = taskRb.isChecked() ? "Task" : "Reminder";
 
-        if(title.isEmpty() || desc.isEmpty() || deadlineEt.getText().toString().isEmpty() || timeEt.getText().toString().isEmpty()){
-            Toast.makeText(this, "Fill all fields", Toast.LENGTH_SHORT).show();
+        String deadline = "";
+        String startTime = "";
+        String remindersCsv = "";
+
+        if(title.isEmpty() || desc.isEmpty()){
+            Toast.makeText(this, "Fill title and description", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Prepare reminders CSV
-        ArrayList<String> reminderList = new ArrayList<>();
-        if(remind10.isChecked()) reminderList.add("10");
-        if(remind30.isChecked()) reminderList.add("30");
-        if(remind60.isChecked()) reminderList.add("60");
-        String remindersCsv = android.text.TextUtils.join(",", reminderList);
+        if(type.equals("Reminder")) {
+            if(deadlineEt.getText().toString().isEmpty() || timeEt.getText().toString().isEmpty()){
+                Toast.makeText(this, "Select date and time for reminder", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            deadline = deadlineEt.getText().toString().trim();
+            startTime = timeEt.getText().toString().trim();
 
-        // Corrected Task constructor
-        Task task = new Task(0, title, desc, priority, status, category, deadline, remindersCsv);
+            // Prepare reminders CSV
+            ArrayList<String> reminderList = new ArrayList<>();
+            if(remind10.isChecked()) reminderList.add("10");
+            if(remind30.isChecked()) reminderList.add("30");
+            if(remind60.isChecked()) reminderList.add("60");
+            remindersCsv = android.text.TextUtils.join(",", reminderList);
+        }
+
+        // Create Task object
+        Task task = new Task(0, title, desc, priority, status, category, deadline, startTime, remindersCsv, type);
 
         if(dbHelper.addTask(task)){
-            Toast.makeText(this, "Task added", Toast.LENGTH_SHORT).show();
-            // schedule reminders
-            for(String r : reminderList){
-                ReminderScheduler.scheduleReminder(this, selectedDateTime, Integer.parseInt(r));
+            Toast.makeText(this, type + " added", Toast.LENGTH_SHORT).show();
+
+            // Schedule reminders if it's a reminder
+            if(type.equals("Reminder")){
+                ArrayList<String> reminderList = new ArrayList<>();
+                if(remind10.isChecked()) reminderList.add("10");
+                if(remind30.isChecked()) reminderList.add("30");
+                if(remind60.isChecked()) reminderList.add("60");
+                for(String r : reminderList){
+                    ReminderScheduler.scheduleReminder(this, selectedDateTime, Integer.parseInt(r));
+                }
             }
+
             finish();
         } else {
-            Toast.makeText(this, "Failed to add task", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Failed to add " + type, Toast.LENGTH_LONG).show();
         }
     }
-
 }
