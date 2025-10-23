@@ -24,6 +24,10 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".AddEditTaskActivity"/>
+        <activity android:name=".TaskActivity" />
+        <activity android:name=".ReminderActivity" />
+        <activity android:name=".AddTaskActivity" />
+        <activity android:name=".AddReminderActivity" />
 
 
     </application>

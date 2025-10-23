@@ -57,7 +57,7 @@ public class AddEditTaskActivity extends AppCompatActivity {
 
         // Show/hide date/time/reminder based on type
         typeGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            if (checkedId == R.id.taskRb.getId()) {
+            if (checkedId == R.id.taskRb) {
                 // Task: hide deadline, time, reminders
                 deadlineEt.setVisibility(View.GONE);
                 timeEt.setVisibility(View.GONE);
